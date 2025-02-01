@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_REGISTRY = "docker.io"
-        DOCKER_IMAGE = "citatech/php-todo-app"
+        DOCKER_IMAGE = "mwangiii/php-todo-app"
         COMPOSE_FILE = "php-todo.yml"
     }
 
@@ -27,7 +27,7 @@ pipeline {
                     checkout([
                         $class: 'GitSCM',
                         branches: [[name: "${params.BRANCH_NAME}"]],
-                        userRemoteConfigs: [[url: 'https://github.com/citadelict/php-todo-containerization.git']]
+                        userRemoteConfigs: [[url: 'https://github.com/mwangiii/docker-php-todo.git']]
                     ])
                 }
             }
