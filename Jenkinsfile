@@ -76,20 +76,20 @@ pipeline {
         //     }
         // }
 
-        // stage('Tag and Push Docker Image') {
-        //     steps {
-        //         script {
-        //             // Tag and push Docker image
-        //             withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-        //                 sh """
-        //                 echo "\$PASSWORD" | docker login -u "\$USERNAME" --password-stdin ${DOCKER_REGISTRY}
-        //                 docker tag php-todo-app ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${env.TAG_NAME}
-        //                 docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${env.TAG_NAME}
-        //                 """
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Tag and Push Docker Image') {
+            steps {
+                script {
+                    // Tag and push Docker image
+                    withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh """
+                        echo "\$PASSWORD" | docker login -u "\$USERNAME" --password-stdin ${DOCKER_REGISTRY}
+                        docker tag php-todo-app ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${env.TAG_NAME}
+                        docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${env.TAG_NAME}
+                        """
+                    }
+                }
+            }
+        }
 
         // stage('Stop and Remove Containers') {
         //     steps {
