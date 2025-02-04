@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_REGISTRY = "docker.io"
         DOCKER_IMAGE = "mwangiii/php-todo-app"
-        COMPOSE_FILE = "php-todo.yml"
+        // COMPOSE_FILE = "php-todo.yml"
     }
 
     parameters {
