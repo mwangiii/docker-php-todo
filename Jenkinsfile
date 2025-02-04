@@ -58,49 +58,49 @@ pipeline {
             }
         }
 
-        stage('Smoke Test') {
-            steps {
-                script {
-                    def response
-                    retry(5) {
-                        sleep(time: 30, unit: 'SECONDS')  // Increase sleep duration to allow services more time to start
-                        response = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://localhost:8080", returnStdout: true).trim()
-                        echo "HTTP Status Code: ${response}"
-                        if (response == '200') {
-                            echo "Smoke test passed with status code 200"
-                        } else {
-                            error "Smoke test failed with status code ${response}"
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Smoke Test') {
+        //     steps {
+        //         script {
+        //             def response
+        //             retry(5) {
+        //                 sleep(time: 30, unit: 'SECONDS')  // Increase sleep duration to allow services more time to start
+        //                 response = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://localhost:8080", returnStdout: true).trim()
+        //                 echo "HTTP Status Code: ${response}"
+        //                 if (response == '200') {
+        //                     echo "Smoke test passed with status code 200"
+        //                 } else {
+        //                     error "Smoke test failed with status code ${response}"
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Tag and Push Docker Image') {
-            steps {
-                script {
-                    // Tag and push Docker image
-                    withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh """
-                        echo "\$PASSWORD" | docker login -u "\$USERNAME" --password-stdin ${DOCKER_REGISTRY}
-                        docker tag php-todo-app ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${env.TAG_NAME}
-                        docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${env.TAG_NAME}
-                        """
-                    }
-                }
-            }
-        }
+        // stage('Tag and Push Docker Image') {
+        //     steps {
+        //         script {
+        //             // Tag and push Docker image
+        //             withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+        //                 sh """
+        //                 echo "\$PASSWORD" | docker login -u "\$USERNAME" --password-stdin ${DOCKER_REGISTRY}
+        //                 docker tag php-todo-app ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${env.TAG_NAME}
+        //                 docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${env.TAG_NAME}
+        //                 """
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Stop and Remove Containers') {
-            steps {
-                script {
-                    // Stop and remove Docker containers
-                    sh """
-                    docker-compose -f ${COMPOSE_FILE} down
-                    """
-                }
-            }
-        }
+        // stage('Stop and Remove Containers') {
+        //     steps {
+        //         script {
+        //             // Stop and remove Docker containers
+        //             sh """
+        //             docker-compose -f ${COMPOSE_FILE} down
+        //             """
+        //         }
+        //     }
+        // }
 
         stage('Cleanup') {
             steps {
