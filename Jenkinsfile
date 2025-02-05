@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_REGISTRY = "docker.io"
-        DOCKER_IMAGE = "mwangiii/php-todo-app"
+        DOCKER_IMAGE = "mwasone/php-todo-app"
     }
 
     parameters {
@@ -21,28 +21,12 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                withCredentials([string(credentialsId: 'github-token-id', variable: 'GITHUB_TOKEN')]) {
-                    script {
-                        def commitSha = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-
-                        // Update GitHub commit status to 'pending'
-                        sh """
-                        curl -X POST -H "Authorization: token ${GITHUB_TOKEN}" \
-                             -H "Accept: application/vnd.github.v3+json" \
-                             -d '{"state": "pending", "context": "jenkins", "description": "Build started", "target_url": "${env.BUILD_URL}"}' \
-                             https://api.github.com/repos/mwangiii/docker-php-todo/statuses/${commitSha}
-                        """
-
-                        checkout([
-                            $class: 'GitSCM',
-                            branches: [[name: "${params.BRANCH_NAME}"]],
-                            userRemoteConfigs: [[
-                                url: 'https://github.com/mwangiii/docker-php-todo.git',
-                                credentialsId: 'github-token-id'
-                            ]],
-                            extensions: [[$class: 'DisableRemotePoll']]
-                        ])
-                    }
+                script {
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "${params.BRANCH_NAME}"]],
+                        userRemoteConfigs: [[url: 'https://github.com/mwangiii/docker-php-todo.git']]
+                    ])
                 }
             }
         }
@@ -88,38 +72,6 @@ pipeline {
         always {
             script {
                 sh 'docker logout'
-            }
-        }
-
-        success {
-            withCredentials([string(credentialsId: 'github-token-id', variable: 'GITHUB_TOKEN')]) {
-                script {
-                    def commitSha = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-
-                    // Update GitHub commit status to 'success'
-                    sh """
-                    curl -X POST -H "Authorization: token ${GITHUB_TOKEN}" \
-                         -H "Accept: application/vnd.github.v3+json" \
-                         -d '{"state": "success", "context": "jenkins", "description": "Build succeeded", "target_url": "${env.BUILD_URL}"}' \
-                         https://api.github.com/repos/mwangiii/docker-php-todo/statuses/${commitSha}
-                    """
-                }
-            }
-        }
-
-        failure {
-            withCredentials([string(credentialsId: 'github-token-id', variable: 'GITHUB_TOKEN')]) {
-                script {
-                    def commitSha = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-
-                    // Update GitHub commit status to 'failure'
-                    sh """
-                    curl -X POST -H "Authorization: token ${GITHUB_TOKEN}" \
-                         -H "Accept: application/vnd.github.v3+json" \
-                         -d '{"state": "failure", "context": "jenkins", "description": "Build failed", "target_url": "${env.BUILD_URL}"}' \
-                         https://api.github.com/repos/mwangiii/docker-php-todo/statuses/${commitSha}
-                    """
-                }
             }
         }
     }
